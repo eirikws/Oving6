@@ -6,28 +6,29 @@ import (
     "strings"
     "time"
     "strconv"
+    "os/exec"
 )
 type Time struct{
 
 
 }
-
-
-
 func main(){
     port := "20001"
     IP :=GetMyIP()
     num:=0
     var eksint int
-    ListenerCon(IP,port)
+    num=ListenerCon(IP,port)
+    cmd:=exec.Command("mate-terminal","-x","go","run","main.go")
+    cmd.Run()
     for{
         time1:=time.Now().Unix()
         time2:=time.Now().Unix()
-        for time1<time2+2{
+        for time1<time2+1{
             time1=time.Now().Unix()    
         }
         num=num+1
         eksint=int(num)
+        fmt.Println(num)
         go UDPcon(IP,port,eksint)
     }
     return
@@ -60,25 +61,29 @@ func UDPcon(IP string,port string, num int){
     con.Write(Bmessage)
 }
 
-func ListenerCon(ipAdr string, port string){
+func ListenerCon(ipAdr string, port string) int {
     serverAddr, err := net.ResolveUDPAddr("udp",ipAdr+":"+port)
     psock, err := net.ListenUDP("udp4", serverAddr)
-    if err != nil { return }
+    var num=0
+    if err != nil { 
+        fmt.Println(err)
+        return 0
+    }
     buf := make([]byte,1024)
-    var readInt strint:=time.Duration
-    psock.SetDeadline(t)
     for {
-        time1:=time.Now().Unix()
-        time2:=time.Now().Unix()
-        for time1<time2+5{
-            time1=time.Now().Unix()
+        if err != nil { return 0}
+        psock.SetDeadline(time.Now().Add(2*time.Second))
+        _,_,err:=psock.ReadFromUDP(buf)
+        if err!=nil{
+            psock.Close()
+            fmt.Println("print num",num)
+            return num
         }
-        if err != nil { return }
-        fmt.Println("teststart")
-        _,_,err=psock.ReadFromUDP(buf)
-        fmt.Println("testStop")
         readInt:=string(buf)
-        fmt.Printf("%s\n",readInt)
+        fmt.Println("%s",readInt)
+        n,_:=strconv.Atoi(readInt)
+        fmt.Println(n)
+        
     }              
 }
 
