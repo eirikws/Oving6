@@ -56,7 +56,7 @@ func UDPcon(IP string,port string, num int){
     if err2 != nil {
                 fmt.Println("faileee2222")
     }
-    Snum:=strconv.Itoa(num)
+    Snum:=strconv.Itoa(num)+"\x00"
     Bmessage:=[]byte(Snum)
     con.Write(Bmessage)
 }
@@ -64,7 +64,7 @@ func UDPcon(IP string,port string, num int){
 func ListenerCon(ipAdr string, port string) int {
     serverAddr, err := net.ResolveUDPAddr("udp",ipAdr+":"+port)
     psock, err := net.ListenUDP("udp4", serverAddr)
-    var num=0
+    num:=0
     if err != nil { 
         fmt.Println(err)
         return 0
@@ -76,13 +76,10 @@ func ListenerCon(ipAdr string, port string) int {
         _,_,err:=psock.ReadFromUDP(buf)
         if err!=nil{
             psock.Close()
-            fmt.Println("print num",num)
             return num
         }
         readInt:=string(buf)
-        fmt.Println("%s",readInt)
-        n,_:=strconv.Atoi(readInt)
-        fmt.Println(n)
+        num,_=strconv.Atoi(strings.Split(readInt, "\x00")[0])
         
     }              
 }
